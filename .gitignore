@@ -1,0 +1,35 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+
+# Virtual environments
+.venv
+env/
+venv/
+
+# Environment Variables
+.env
+
+# Runtime Data & State
+chroma_db/
+chat_history.json
+file_state.json
+
+# Documentation (Dev only)
+project-docs/
+
+# Dev Tools & Tests
+tests/
+scripts/
+
+# User Content
+documents/
+
+# IDE settings
+.vscode/
+.idea/
