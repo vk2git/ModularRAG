@@ -27,10 +27,6 @@ graph TB
     
     D -.->|No Relevant Docs| G
     
-    style A fill:#e1f5ff
-    style C fill:#fff4e1
-    style G fill:#ffe1f5
-    style J fill:#e1ffe1
 ```
 
 **Key Concepts:**
@@ -325,37 +321,28 @@ We welcome contributions! Here's how:
 - Write tests for new features
 
 ---
-## 🗺️ Roadmap & Planned Features
+## Planned Features
 
-- [ ] **FastAPI REST Endpoints** (v2.0)  
-  HTTP API for remote integrations with Swagger docs
-- [ ] **Async Ingestion**  
-  Background processing for large document sets
+- [ ] **FastAPI REST Endpoints and web UI**  
+  HTTPS API for remote integrations with Swagger docs and Streamlit/Next.js interface for non-developers
+- [ ] **Async Ingestion Parallel Document Processing**  
+  Background processing for large document sets, Multi-threaded/multi-process ingestion for speed
 - [ ] **GraphRAG Support**  
   Knowledge graph extraction for better context understanding
-- [ ] **Parallel Document Processing**  
-  Multi-threaded/multi-process ingestion for speed
 - [ ] **Database Connectors**  
   Ingest directly from SQL/NoSQL databases (Postgres, MongoDB)
-- [ ] **Web UI**  
-  Streamlit/Next.js interface for non-developers
 - [ ] **Multi-Tenancy**  
-  Support for multiple isolated knowledge bases
-- [ ] **Advanced Chunking Strategies**  
-  Smart chunking based on document structure (headers, sections)
-- [ ] **Query Rewriting**  
-  Automatic query expansion and reformulation
+  Support for multiple isolated knowledge bases 
 - [ ] **Citation Tracking**  
   Show which document chunks were used in the response
 - [ ] **Cost Tracking**  
   Monitor API usage and token costs for cloud providers
-
+- [ ] **Advanced Chunking Strategies**  
+- [ ] **Query Rewriting** 
 ---
 ### 💡 Ideas & Proposals
 Have a feature request? [Open an issue](https://github.com/vk2git/ModularRAG/issues) with the `feature-request` label
-## 🤝 Community & Support
-- **Issues**: [GitHub Issues](https://github.com/vk2git/ModularRAG/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/vk2git/ModularRAG/discussions)
+
 ## 🙏 Acknowledgments
 Built with:
 - [LangChain](https://langchain.com) — LLM orchestration framework
