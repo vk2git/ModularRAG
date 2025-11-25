@@ -1,68 +1,8 @@
 # ModularRAG
 
-ModularRAG is designed for flexibility and ease of integration. Every component; from the LLM to the vector database to memory management; can be swapped via simple configuration changes. No code changes required.
+Designed for flexibility and ease of integration. Every component; from the LLM to the vector database to memory management; can be swapped via simple configuration changes. No code changes required.
 
 ModularRAG transforms your documents into an intelligent knowledge base. Instead of manually searching through PDFs, text files, or documentation, you can ask questions in natural language and get precise answers grounded in your data.
-### How It Works
-
-```mermaid
-graph TB
-    subgraph "1️⃣ Document Ingestion"
-        A[Your Documents<br/>PDFs, TXT, DOCX, MD] -->|Hash Tracking| B[Ingestion Pipeline]
-        B -->|Chunk & Embed| C[(Vector Database<br/>ChromaDB/Pinecone)]
-    end
-    
-    subgraph "2️⃣ Query Processing"
-        D[User Question] -->|Input Validation| E[Guardrails]
-        E -->|Embed Query| F[Similarity Search]
-        F -->|Retrieve Context| C
-    end
-    
-    subgraph "3️⃣ Response Generation"
-        C -->|Top-K Relevant Chunks| G[LLM<br/>OpenAI/Gemini/Ollama]
-        H[Conversation History] -->|Context| G
-        G -->|PII Detection| I[Output Guardrails]
-        I -->|Final Answer| J[User]
-    end
-    
-    D -.->|No Relevant Docs| G
-    
-```
-
-**Key Concepts:**
-- **Ingestion**: Documents are chunked, embedded (converted to vectors), and stored in a vector database
-- **Retrieval**: User queries are embedded and matched against stored chunks using similarity search
-- **Generation**: The LLM uses retrieved context + conversation history to generate accurate responses
-- **Guardrails**: Built-in safety checks prevent prompt injection, filter PII, and enforce content policies
-
----
-## ✨ Key Features
-### 🔌 Plugin Architecture
-- **Swappable LLMs**: OpenAI, Google Gemini, Anthropic Claude, Ollama (local), or custom
-- **Swappable Vector Databases**: ChromaDB (local), Pinecone (cloud), or custom
-- **Swappable Embeddings**: HuggingFace (local), OpenAI, Google, or custom
-- **Custom Components**: Add your own LLM, vector store, or memory backend via plugins
-
-### 🧠 Memory Management
-- **Window Memory**: Sliding window of last N messages (default: 10)
-- **Summary Memory**: LLM-powered summarization for long conversations
-- **Vector Memory**: Semantic search over conversation history ("infinite memory")
-- **Redis Support**: Distributed memory for multi-instance deployments
-
-### 🛡️ Built-in Guardrails
-- **Prompt Injection Detection**: 14+ attack patterns (e.g., "ignore all previous instructions")
-- **PII Redaction**: Auto-detect and redact emails, phone numbers, SSNs, credit cards
-- **Input Validation**: Length limits, special character filtering, empty input checks
-- **Toxicity Filtering**: Optional LLM-based content moderation
-- **Topic Restriction**: Limit queries to specific domains
-
-### 📄 Multi-Format Document Support
-PDF, TXT, DOCX, CSV, Markdown, JSON with automatic chunking and metadata extraction.
-
-### ⚡ Smart Retrieval
-- **Similarity Threshold Filtering**: Only use relevant documents (configurable score threshold)
-- **Stateful Ingestion**: File hash tracking to avoid reprocessing unchanged documents
-- **Nested Folder Support**: Recursively scans subdirectories
 
 ---
 
@@ -163,6 +103,92 @@ Bot: You can configure ModularRAG by editing config/settings.yaml...
 You: exit
 👋 Goodbye!
 ```
+
+
+### Visualization
+```mermaid
+graph TD
+    User[User] -->|Query| GuardIn[Input Guardrails]
+    
+    subgraph "Modular RAG Workflow"
+        direction TB
+        GuardIn -->|Validated| Embed{Embedding Model}
+        Embed -->|Vector Search| VDB{Vector Database}
+        VDB -->|Context + History| LLM{LLM Core}
+    end
+    
+    LLM -->|Generation| GuardOut[Output Guardrails]
+    GuardOut -->|Response| User
+
+    %% Swappable Annotations
+    Embed -.- E_Note[Swappable:<br/>HuggingFace, OpenAI, Custom]
+    VDB -.- V_Note[Swappable:<br/>Chroma, Pinecone, Custom]
+    LLM -.- L_Note[Swappable:<br/>Ollama, GPT-4, Custom]
+    
+    style Embed fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style VDB fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    style LLM fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+```
+### General Workflow
+
+```mermaid
+graph TB
+    subgraph "1️⃣ Document Ingestion"
+        A[Your Documents<br/>PDFs, TXT, DOCX, MD] -->|Hash Tracking| B[Ingestion Pipeline]
+        B -->|Chunk & Embed| C[(Vector Database<br/>ChromaDB/Pinecone)]
+    end
+    
+    subgraph "2️⃣ Query Processing"
+        D[User Question] -->|Input Validation| E[Guardrails]
+        E -->|Embed Query| F[Similarity Search]
+        F -->|Retrieve Context| C
+    end
+    
+    subgraph "3️⃣ Response Generation"
+        C -->|Top-K Relevant Chunks| G[LLM<br/>OpenAI/Gemini/Ollama]
+        H[Conversation History] -->|Context| G
+        G -->|PII Detection| I[Output Guardrails]
+        I -->|Final Answer| J[User]
+    end
+    
+    D -.->|No Relevant Docs| G
+    
+```
+
+**Key Concepts:**
+- **Ingestion**: Documents are chunked, embedded (converted to vectors), and stored in a vector database
+- **Retrieval**: User queries are embedded and matched against stored chunks using similarity search
+- **Generation**: The LLM uses retrieved context + conversation history to generate accurate responses
+- **Guardrails**: Built-in safety checks prevent prompt injection, filter PII, and enforce content policies
+
+---
+## ✨ Key Features
+### 🔌 Plugin Architecture
+- **Swappable LLMs**: OpenAI, Google Gemini, Anthropic Claude, Ollama (local), or custom
+- **Swappable Vector Databases**: ChromaDB (local), Pinecone (cloud), or custom
+- **Swappable Embeddings**: HuggingFace (local), OpenAI, Google, or custom
+- **Custom Components**: Add your own LLM, vector store, or memory backend via plugins
+
+### 🧠 Memory Management
+- **Window Memory**: Sliding window of last N messages (default: 10)
+- **Summary Memory**: LLM-powered summarization for long conversations
+- **Vector Memory**: Semantic search over conversation history ("infinite memory")
+- **Redis Support**: Distributed memory for multi-instance deployments
+
+### 🛡️ Built-in Guardrails
+- **Prompt Injection Detection**: 14+ attack patterns (e.g., "ignore all previous instructions")
+- **PII Redaction**: Auto-detect and redact emails, phone numbers, SSNs, credit cards
+- **Input Validation**: Length limits, special character filtering, empty input checks
+- **Toxicity Filtering**: Optional LLM-based content moderation
+- **Topic Restriction**: Limit queries to specific domains
+
+### 📄 Multi-Format Document Support
+PDF, TXT, DOCX, CSV, Markdown, JSON with automatic chunking and metadata extraction.
+
+### ⚡ Smart Retrieval
+- **Similarity Threshold Filtering**: Only use relevant documents (configurable score threshold)
+- **Stateful Ingestion**: File hash tracking to avoid reprocessing unchanged documents
+- **Nested Folder Support**: Recursively scans subdirectories
 
 ---
 
@@ -321,28 +347,37 @@ We welcome contributions! Here's how:
 - Write tests for new features
 
 ---
-## Planned Features
+## 🗺️ Roadmap & Planned Features
 
-- [ ] **FastAPI REST Endpoints and web UI**  
-  HTTPS API for remote integrations with Swagger docs and Streamlit/Next.js interface for non-developers
-- [ ] **Async Ingestion Parallel Document Processing**  
-  Background processing for large document sets, Multi-threaded/multi-process ingestion for speed
+- [ ] **FastAPI REST Endpoints** (v2.0)  
+  HTTP API for remote integrations with Swagger docs
+- [ ] **Async Ingestion**  
+  Background processing for large document sets
 - [ ] **GraphRAG Support**  
   Knowledge graph extraction for better context understanding
+- [ ] **Parallel Document Processing**  
+  Multi-threaded/multi-process ingestion for speed
 - [ ] **Database Connectors**  
   Ingest directly from SQL/NoSQL databases (Postgres, MongoDB)
+- [ ] **Web UI**  
+  Streamlit/Next.js interface for non-developers
 - [ ] **Multi-Tenancy**  
-  Support for multiple isolated knowledge bases 
+  Support for multiple isolated knowledge bases
+- [ ] **Advanced Chunking Strategies**  
+  Smart chunking based on document structure (headers, sections)
+- [ ] **Query Rewriting**  
+  Automatic query expansion and reformulation
 - [ ] **Citation Tracking**  
   Show which document chunks were used in the response
 - [ ] **Cost Tracking**  
   Monitor API usage and token costs for cloud providers
-- [ ] **Advanced Chunking Strategies**  
-- [ ] **Query Rewriting** 
+
 ---
 ### 💡 Ideas & Proposals
 Have a feature request? [Open an issue](https://github.com/vk2git/ModularRAG/issues) with the `feature-request` label
-
+## 🤝 Community & Support
+- **Issues**: [GitHub Issues](https://github.com/vk2git/ModularRAG/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/vk2git/ModularRAG/discussions)
 ## 🙏 Acknowledgments
 Built with:
 - [LangChain](https://langchain.com) — LLM orchestration framework
