@@ -9,7 +9,7 @@ ModularRAG transforms your documents into an intelligent knowledge base. Instead
 ## 🚀 Getting Started
 ### Prerequisites
 - Python 3.10+ (3.12 recommended)
-- `uv` package manager (or `pip`)
+- `uv` package manager
 - **(Optional)** Ollama for local LLMs: [ollama.ai](https://ollama.ai)
 - **(Optional)** API keys for cloud providers (OpenAI, Google, Anthropic)
 
@@ -21,8 +21,8 @@ cd ModularRAG
 
 # Install dependencies using uv (recommended)
 uv sync
-# OR using pip
-pip install -r requirements.txt
+# OR 
+uv pip install -r requirements.txt
 ```
 
 ### Step 2: Configuration
@@ -218,10 +218,10 @@ print(response)
 ### Method 2: Install as Package
 ```bash
 # Install from GitHub
-pip install git+https://github.com/vk2git/ModularRAG.git
+uv pip install git+https://github.com/vk2git/ModularRAG.git
 
 # OR install locally
-pip install .
+uv pip install .
 ```
 
 Then in your code:
@@ -245,21 +245,18 @@ git pull origin main
 
 # Update dependencies
 uv sync  # or: pip install -r requirements.txt --upgrade
-
-# Re-run tests (optional)
-uv run tests/test_step_5_rag_pipeline.py
 ```
 
 ### For Package Users
 
 ```bash
 # Reinstall from GitHub
-pip install --upgrade git+https://github.com/vk2git/ModularRAG.git
+uv pip install --upgrade git+https://github.com/vk2git/ModularRAG.git
 
 # OR if installed locally
 cd ModularRAG
 git pull origin main
-pip install --upgrade .
+uv pip install --upgrade .
 ```
 
 
@@ -274,9 +271,6 @@ cd ModularRAG
 
 # Install in editable mode with dev dependencies
 uv pip install -e ".[dev]"
-
-# OR with pip
-pip install -e ".[dev]"
 ```
 
 ### Project Structure
