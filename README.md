@@ -29,15 +29,18 @@ pip install -r requirements.txt
 All settings are controlled via `config/settings.yaml`. The default configuration uses **local-only** components (Ollama + ChromaDB + HuggingFace embeddings).
 
 **For Cloud Providers:**
-1. Create a `.env` file in the project root:
+1. Create a `.env` file in the project root and add:
    ```bash
-   OPENAI_API_KEY=sk-...
+   # .env file can be empty (if using locally)
+   OPENAI_API_KEY=...
    GOOGLE_API_KEY=...
    ANTHROPIC_API_KEY=...
    ```
 
 2. Edit `config/settings.yaml`:
    ```yaml
+   # Choose your settings
+   # Example:
    llm:
      mode: "cloud"  # Change from "local"
      cloud:
@@ -68,6 +71,7 @@ cp /path/to/your/files/*.pdf documents/
 **Supported formats**: `.pdf`, `.txt`, `.docx`, `.csv`, `.md`, `.json`
 
 > Future updates will include database connection
+
 ### Step 4: Ingest Documents
 ```bash
 # Run the ingestion pipeline
@@ -125,10 +129,38 @@ graph TD
     VDB -.- V_Note[Swappable:<br/>Chroma, Pinecone, Custom]
     LLM -.- L_Note[Swappable:<br/>Ollama, GPT-4, Custom]
     
-    style Embed fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    style VDB fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
-    style LLM fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
 ```
+---
+## ✨ Key Features
+### 🔌 Plugin Architecture
+- **Swappable LLMs**: OpenAI, Google Gemini, Anthropic Claude, Ollama (local), or custom
+- **Swappable Vector Databases**: ChromaDB (local), Pinecone (cloud), or custom
+- **Swappable Embeddings**: HuggingFace (local), OpenAI, Google, or custom
+- **Custom Components**: Add your own LLM, vector store, or memory backend via plugins
+
+### 🧠 Memory Management
+- **Window Memory**: Sliding window of last N messages (default: 10)
+- **Summary Memory**: LLM-powered summarization for long conversations
+- **Vector Memory**: Semantic search over conversation history ("infinite memory")
+- **Redis Support**: Distributed memory for multi-instance deployments
+
+### 🛡️ Built-in Guardrails
+- **Prompt Injection Detection**: 14+ attack patterns (e.g., "ignore all previous instructions")
+- **PII Redaction**: Auto-detect and redact emails, phone numbers, SSNs, credit cards
+- **Input Validation**: Length limits, special character filtering, empty input checks
+- **Toxicity Filtering**: Optional LLM-based content moderation
+- **Topic Restriction**: Limit queries to specific domains
+
+### 📄 Multi-Format Document Support
+PDF, TXT, DOCX, CSV, Markdown, JSON with automatic chunking and metadata extraction.
+
+### ⚡ Smart Retrieval
+- **Similarity Threshold Filtering**: Only use relevant documents (configurable score threshold)
+- **Stateful Ingestion**: File hash tracking to avoid reprocessing unchanged documents
+- **Nested Folder Support**: Recursively scans subdirectories
+
+---
+
 ### General Workflow
 
 ```mermaid
@@ -160,35 +192,6 @@ graph TB
 - **Retrieval**: User queries are embedded and matched against stored chunks using similarity search
 - **Generation**: The LLM uses retrieved context + conversation history to generate accurate responses
 - **Guardrails**: Built-in safety checks prevent prompt injection, filter PII, and enforce content policies
-
----
-## ✨ Key Features
-### 🔌 Plugin Architecture
-- **Swappable LLMs**: OpenAI, Google Gemini, Anthropic Claude, Ollama (local), or custom
-- **Swappable Vector Databases**: ChromaDB (local), Pinecone (cloud), or custom
-- **Swappable Embeddings**: HuggingFace (local), OpenAI, Google, or custom
-- **Custom Components**: Add your own LLM, vector store, or memory backend via plugins
-
-### 🧠 Memory Management
-- **Window Memory**: Sliding window of last N messages (default: 10)
-- **Summary Memory**: LLM-powered summarization for long conversations
-- **Vector Memory**: Semantic search over conversation history ("infinite memory")
-- **Redis Support**: Distributed memory for multi-instance deployments
-
-### 🛡️ Built-in Guardrails
-- **Prompt Injection Detection**: 14+ attack patterns (e.g., "ignore all previous instructions")
-- **PII Redaction**: Auto-detect and redact emails, phone numbers, SSNs, credit cards
-- **Input Validation**: Length limits, special character filtering, empty input checks
-- **Toxicity Filtering**: Optional LLM-based content moderation
-- **Topic Restriction**: Limit queries to specific domains
-
-### 📄 Multi-Format Document Support
-PDF, TXT, DOCX, CSV, Markdown, JSON with automatic chunking and metadata extraction.
-
-### ⚡ Smart Retrieval
-- **Similarity Threshold Filtering**: Only use relevant documents (configurable score threshold)
-- **Stateful Ingestion**: File hash tracking to avoid reprocessing unchanged documents
-- **Nested Folder Support**: Recursively scans subdirectories
 
 ---
 
