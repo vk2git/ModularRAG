@@ -1,0 +1,15 @@
+# Adaptive RAG Configuration
+# Auto-routes queries to the best architecture based on complexity
+
+# Default number of documents to retrieve
+top_k: 5
+
+# Score threshold for naive mode
+score_threshold: 1.5
+
+# Routing rules: which architecture to use for each complexity level
+routing:
+  simple: "naive"         # Direct factual questions → fast path
+  moderate: "advanced"    # Synthesis questions → rewrite + rerank
+  complex: "corrective"   # Analytical questions → grade + retry
+  exploratory: "agentic"  # Open-ended research → agent with tools

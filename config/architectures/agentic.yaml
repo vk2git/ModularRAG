@@ -1,0 +1,11 @@
+# Agentic RAG Configuration
+# LLM agent with tools for iterative, multi-hop reasoning
+
+# Number of documents per retrieval
+top_k: 5
+
+# Maximum agent reasoning steps (prevents infinite loops)
+max_agent_steps: 10
+
+# Enable web search as an agent tool
+web_search: true

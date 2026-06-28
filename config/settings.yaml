@@ -1,10 +1,23 @@
 # config/settings.yaml
+# Global configuration for ModularRAG
 
 app:
-  name: "Modular RAG Tool"
+  name: "ModularRAG"
+  version: "2.0.0"
   environment: "development"
 
+# ============================================================
+# ARCHITECTURE SETTINGS
+# ============================================================
+# Choose which RAG architecture to use.
+# Each architecture has its own config file in config/architectures/
+architecture:
+  active: "naive"
+  # Options: naive, advanced, corrective, self_rag, agentic, adaptive, graph_rag
+
+# ============================================================
 # 1. LLM SETTINGS
+# ============================================================
 llm:
   mode: "local" # Options: 'local', 'cloud', 'custom'
   
@@ -23,10 +36,12 @@ llm:
   #   class_name: "MyCustomLLM"
   #   kwargs:
   #     temperature: 0.7
-  #     # WARNING: Do not put API keys here! Use os.getenv() in your plugin code.
 
+# ============================================================
+# 2. EMBEDDING SETTINGS
+# ============================================================
 embedding:
-  provider: "huggingface" # Options: huggingface (local), openai (cloud), custom
+  provider: "huggingface" # Options: huggingface (local), openai (cloud), google, custom
   
   huggingface:
     model_name: "sentence-transformers/all-MiniLM-L6-v2" # Small, fast, good for CPU
@@ -37,12 +52,9 @@ embedding:
   google:
     model_name: "models/text-embedding-004"
 
-  # Custom Plugin Example:
-  # custom:
-  #   module_path: "src.plugins.my_embeddings"
-  #   class_name: "MyEmbeddings"
-
+# ============================================================
 # 3. VECTOR STORE SETTINGS
+# ============================================================
 vector_db:
   provider: "chroma" # Options: chroma (local), pinecone (cloud), custom
   
@@ -52,86 +64,102 @@ vector_db:
   pinecone:
     index_name: "rag-index"
 
-  # Custom Plugin Example:
-  # custom:
-  #   module_path: "src.plugins.my_vectorstore"
-  #   class_name: "MyVectorStore"
+# ============================================================
+# 4. RETRIEVER SETTINGS
+# ============================================================
+retriever:
+  strategy: "basic"  # Options: basic, hybrid, reranked
+  k: 5               # Number of documents to retrieve
+  hybrid_weights: [0.5, 0.5]  # [vector_weight, bm25_weight] for hybrid
 
-# 3. HARDWARE SETTINGS
+# ============================================================
+# 5. RERANKER SETTINGS (used by Advanced RAG)
+# ============================================================
+reranker:
+  provider: "cross_encoder"  # Options: cross_encoder (free), cohere (API key)
+  cross_encoder_model: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+  cohere_model: "rerank-english-v3.0"
+  top_n: 5
+
+# ============================================================
+# 6. WEB SEARCH SETTINGS (used by Corrective, Agentic, Adaptive RAG)
+# ============================================================
+web_search:
+  enabled: true          # On by default. Set to false to disable.
+  provider: "duckduckgo"  # Options: tavily (API key), duckduckgo (free)
+  max_results: 3
+
+# ============================================================
+# 7. HARDWARE SETTINGS
+# ============================================================
 compute:
-  device: "cpu" # Options: cpu, cuda (The code will auto-detect, but this acts as a force override)
+  device: "cpu" # Options: cpu, cuda
 
-# 4. BEHAVIOR
+# ============================================================
+# 8. RAG BEHAVIOR
+# ============================================================
 rag:
-  fallback_to_general_chat: true # If no docs found, chat normally
-  score_threshold: 1.5 # Distance threshold (Lower is better for Cosine/Euclidean in Chroma)
+  fallback_to_general_chat: true
+  score_threshold: 1.5
 
-# 5. MEMORY SETTINGS
+# ============================================================
+# 9. MEMORY SETTINGS
+# ============================================================
 memory:
   provider: "local" # Options: 'local', 'redis', 'custom'
   type: "window"    # Options: 'window', 'summary', 'vector'
   
-  window_size: 10   # Only used if type is 'window'
+  window_size: 10
   
   vector_memory:
     collection_name: "chat_memory"
-    k: 5 # Number of past messages to retrieve
+    k: 5
   
   local:
     file_path: "chat_history.json"
     
   redis:
     url: "redis://localhost:6379"
-    ttl: 86400 # 24 hours
+    ttl: 86400
 
-  # Custom Plugin Example (e.g. Postgres, DynamoDB):
-  # custom:
-  #   module_path: "src.plugins.my_memory"
-  #   class_name: "MyPostgresMemory"
-  #   kwargs:
-  #     connection_string: "postgresql://..."
-
-# 6. GUARDRAILS SETTINGS
+# ============================================================
+# 10. GUARDRAILS SETTINGS
+# ============================================================
 guardrails:
-  enabled: true # Master switch for all guardrails
+  enabled: true
   
-  # Individual validator configurations
   validators:
-    # Detects prompt injection attack patterns
     prompt_injection:
       enabled: true
-      patterns: "default"  # Options: "default", "strict", or custom list
+      patterns: "default"
     
-    # Validates input length limits
     input_length:
       enabled: true
       max_length: 10000
     
-    # Detects excessive special characters
     special_characters:
       enabled: true
-      max_ratio: 0.3  # 30% maximum
+      max_ratio: 0.3
     
-    # Detects and redacts PII from outputs
     pii_detector:
       enabled: true
       redact_types: ["email", "phone", "ssn", "credit_card"]
     
-    # Validates input is not empty
     empty_input:
       enabled: true
 
-    # Restricts queries to specific topics (Requires LLM)
     topic_restriction:
-      enabled: false # Enable and set topics to use
+      enabled: false
       allowed_topics: ["general knowledge", "technology", "science"]
 
-    # Filters toxic content (Requires LLM)
     toxicity_filter:
-      enabled: false # Enable to filter harmful content
+      enabled: false
 
-    # Custom Validator Example:
-    # my_custom_check:
-    #   enabled: true
-    #   module_path: "src.plugins.my_validator"
-    #   class_name: "MyValidator"
+# ============================================================
+# 11. MONITORING (Optional)
+# ============================================================
+# LangSmith tracing is auto-enabled if LANGSMITH_API_KEY is set.
+# No configuration needed here. Just set these env vars:
+#   LANGSMITH_API_KEY=your_key
+#   LANGCHAIN_TRACING_V2=true
+#   LANGCHAIN_PROJECT=ModularRAG

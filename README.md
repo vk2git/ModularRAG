@@ -1,14 +1,60 @@
 # ModularRAG
 
-Designed for flexibility and ease of integration. Every component; from the LLM to the vector database to memory management; can be swapped via simple configuration changes. No code changes required.
+**A multi-architecture RAG platform** designed for flexibility and ease of integration. Choose from 7 RAG architecture types, each with fully swappable components — from the LLM to the vector database to memory management — configurable via simple YAML files. No code changes required.
 
-ModularRAG transforms your documents into an intelligent knowledge base. Instead of manually searching through PDFs, text files, or documentation, you can ask questions in natural language and get precise answers grounded in your data.
+> **Design Decision — Framework Choice**: LangChain is the primary orchestration framework. LlamaIndex is supported as an optional retriever backend (install with `uv pip install 'modular-rag[llamaindex]'`). This avoids dual-framework dependency issues while allowing users who prefer LlamaIndex's data connectors to plug them in. LangGraph powers the advanced graph-based architectures (Corrective, Self-RAG, Agentic, Adaptive).
+
+---
+
+## 🏗️ Architecture Types
+
+ModularRAG supports **7 RAG architectures**, each suited for different use cases:
+
+| Architecture | Description | Best For |
+|---|---|---|
+| **Naive RAG** | Simple retrieve → generate | POCs, demos, simple Q&A |
+| **Advanced RAG** | Query rewriting + hybrid search + reranking | Production systems |
+| **Corrective RAG** | Grades docs, rewrites or falls back to web search | High-accuracy requirements |
+| **Self-RAG** | Self-reflective generation with hallucination checks | Critical applications |
+| **Agentic RAG** | LLM agent with tools for iterative reasoning | Multi-hop questions |
+| **Adaptive RAG** | Auto-routes queries to the best architecture | Cost/performance optimization |
+| **Graph RAG** | Knowledge graph + vector hybrid retrieval | Relationship-heavy data |
+
+```mermaid
+graph TD
+    User[User Query] --> Router{Architecture Router}
+    
+    Router --> Naive[Naive RAG]
+    Router --> Advanced[Advanced RAG]
+    Router --> CRAG[Corrective RAG]
+    Router --> SelfRAG[Self-RAG]
+    Router --> Agentic[Agentic RAG]
+    Router --> Adaptive[Adaptive RAG]
+    Router --> GraphRAG[Graph RAG]
+
+    subgraph "Shared Components (Swappable)"
+        LLM[LLM<br/>Ollama/GPT-4/Gemini/Claude]
+        Embed[Embeddings<br/>HuggingFace/OpenAI/Google]
+        VDB[Vector DB<br/>Chroma/Pinecone]
+        Mem[Memory<br/>Window/Summary/Vector]
+        Guard[Guardrails<br/>PII/Injection/Toxicity]
+    end
+
+    Naive --> LLM
+    Advanced --> LLM
+    CRAG --> LLM
+    SelfRAG --> LLM
+    Agentic --> LLM
+    Adaptive --> LLM
+    GraphRAG --> LLM
+```
 
 ---
 
 ## 🚀 Getting Started
+
 ### Prerequisites
-- Python 3.10+ (3.12 recommended)
+- Python 3.12+
 - `uv` package manager
 - **(Optional)** Ollama for local LLMs: [ollama.ai](https://ollama.ai)
 - **(Optional)** API keys for cloud providers (OpenAI, Google, Anthropic)
@@ -19,367 +65,321 @@ ModularRAG transforms your documents into an intelligent knowledge base. Instead
 git clone https://github.com/vk2git/ModularRAG.git
 cd ModularRAG
 
-# Install dependencies using uv (recommended)
+# Install core dependencies
 uv sync
-# OR 
-uv pip install -r requirements.txt
+
+# Optional: install extras for specific features
+uv pip install 'modular-rag[rerank]'     # Cross-encoder reranking
+uv pip install 'modular-rag[search]'     # Web search fallback
+uv pip install 'modular-rag[graph]'      # Graph RAG (Neo4j)
+uv pip install 'modular-rag[monitoring]' # LangSmith tracing
+uv pip install 'modular-rag[all]'        # Everything
 ```
 
 ### Step 2: Configuration
-All settings are controlled via `config/settings.yaml`. The default configuration uses **local-only** components (Ollama + ChromaDB + HuggingFace embeddings).
+All settings are in `config/settings.yaml`. Architecture-specific settings are in `config/architectures/<name>.yaml`.
+
+```yaml
+# Choose your architecture
+architecture:
+  active: "naive"   # Options: naive, advanced, corrective, self_rag, agentic, adaptive, graph_rag
+
+# Choose your LLM
+llm:
+  mode: "local"     # Options: local, cloud, custom
+  local:
+    model_name: "mistral"
+```
 
 **For Cloud Providers:**
-1. Create a `.env` file in the project root and add:
-   ```bash
-   # .env file can be empty (if using locally)
-   OPENAI_API_KEY=...
-   GOOGLE_API_KEY=...
-   ANTHROPIC_API_KEY=...
-   ```
-
-2. Edit `config/settings.yaml`:
-   ```yaml
-   # Choose your settings
-   # Example:
-   llm:
-     mode: "cloud"  # Change from "local"
-     cloud:
-       provider: "openai"  # or "google", "anthropic"
-       model_name: "gpt-4o"
-   ```
-
-**Key Configuration Options:**
-
-| Section              | Option                                         | Description          |
-| -------------------- | ---------------------------------------------- | -------------------- |
-| `llm.mode`           | `local`/`cloud`/`custom`                       | LLM Source           |
-| `embedding.provider` | `huggingface` / `openai` / `google` / `custom` | Embedding model      |
-| `vector_db.provider` | `chroma` / `pinecone` / `custom`               | Vector database      |
-| `memory.type`        | `window` / `summary` / `vector`                | Memory strategy      |
-| `guardrails.enabled` | `true` / `false`                               | Enable safety checks |
-
-📖 **Full configuration guide**: See `config/settings.yaml` for all options and examples.
+```bash
+# .env file
+OPENAI_API_KEY=...
+GOOGLE_API_KEY=...
+ANTHROPIC_API_KEY=...
+```
 
 ### Step 3: Add Your Documents
 ```bash
-# Create the documents folder (if not exists)
 mkdir -p documents
-
-# Add your files
 cp /path/to/your/files/*.pdf documents/
 ```
 **Supported formats**: `.pdf`, `.txt`, `.docx`, `.csv`, `.md`, `.json`
 
-> Future updates will include database connection
-
 ### Step 4: Ingest Documents
 ```bash
-# Run the ingestion pipeline
 uv run main.py --ingest
-
-# OR directly
-uv run src/core/ingest.py
 ```
-
-**What happens during ingestion:**
-1. Files are scanned recursively from `documents/` folder
-2. New/modified files are detected via hash tracking (`file_state.json`)
-3. Documents are chunked into manageable pieces
-4. Chunks are embedded and stored in the vector database
-5. Progress indicators show status: `✓` (success) or `✗` (error)
 
 ### Step 5: Start Chatting
 ```bash
-# Start the interactive chat CLI
+# Default: uses architecture from config
 uv run main.py
 
-# OR with verbose logging (shows retrieval scores)
+# Or specify an architecture
+uv run main.py --arch advanced
+```
+
+---
+
+## 🖥️ CLI Reference
+
+```bash
+# List all architectures with status
+uv run main.py --list
+
+# Interactively select an architecture (saves to config)
+uv run main.py --select
+
+# Run with a specific architecture (one-time, doesn't save)
+uv run main.py --arch corrective
+
+# Show configuration
+uv run main.py --config
+uv run main.py --config advanced
+
+# Health check
+uv run main.py --health
+
+# Ingest documents
+uv run main.py --ingest
+
+# Verbose mode
 uv run main.py --verbose
 ```
-**Example session:**
-```
-You: What is ModularRAG?
-Bot: ModularRAG is a production-ready RAG system that combines LLMs with your documents...
 
-You: How do I configure it?
-Bot: You can configure ModularRAG by editing config/settings.yaml...
+**In-Chat Commands:**
+| Command | Action |
+|---|---|
+| `list` | Show available architectures |
+| `switch <name>` | Switch architecture mid-conversation |
+| `websearch` | Toggle web search on/off |
+| `health` | Run health checks |
+| `info` | Show current architecture info |
+| `exit` | Quit |
 
-You: exit
-👋 Goodbye!
-```
-
-
-### Visualization
-```mermaid
-graph TD
-    User[User] -->|Query| GuardIn[Input Guardrails]
-    
-    subgraph "Modular RAG Workflow"
-        direction TB
-        GuardIn -->|Validated| Embed{Embedding Model}
-        Embed -->|Vector Search| VDB{Vector Database}
-        VDB -->|Context + History| LLM{LLM Core}
-    end
-    
-    LLM -->|Generation| GuardOut[Output Guardrails]
-    GuardOut -->|Response| User
-
-    %% Swappable Annotations
-    Embed -.- E_Note[Swappable:<br/>HuggingFace, OpenAI, Custom]
-    VDB -.- V_Note[Swappable:<br/>Chroma, Pinecone, Custom]
-    LLM -.- L_Note[Swappable:<br/>Ollama, GPT-4, Custom]
-    
-```
 ---
-## ✨ Key Features
-### 🔌 Plugin Architecture
-- **Swappable LLMs**: OpenAI, Google Gemini, Anthropic Claude, Ollama (local), or custom
-- **Swappable Vector Databases**: ChromaDB (local), Pinecone (cloud), or custom
-- **Swappable Embeddings**: HuggingFace (local), OpenAI, Google, or custom
-- **Custom Components**: Add your own LLM, vector store, or memory backend via plugins
 
-### 🧠 Memory Management
-- **Window Memory**: Sliding window of last N messages (default: 10)
-- **Summary Memory**: LLM-powered summarization for long conversations
-- **Vector Memory**: Semantic search over conversation history ("infinite memory")
-- **Redis Support**: Distributed memory for multi-instance deployments
+## ✨ Key Features
+
+### 🔌 Swappable Components
+- **LLMs**: OpenAI, Google Gemini, Anthropic Claude, Ollama (local), or custom
+- **Vector Databases**: ChromaDB (local), Pinecone (cloud), or custom
+- **Embeddings**: HuggingFace (local), OpenAI, Google, or custom
+- **Retrievers**: Basic (top-K), Hybrid (vector + BM25), Reranked (cross-encoder)
+- **Rerankers**: Cross-encoder (free, local), Cohere (cloud)
+- **Memory**: Window, Summary, Vector, Redis
 
 ### 🛡️ Built-in Guardrails
-- **Prompt Injection Detection**: 14+ attack patterns (e.g., "ignore all previous instructions")
-- **PII Redaction**: Auto-detect and redact emails, phone numbers, SSNs, credit cards
-- **Input Validation**: Length limits, special character filtering, empty input checks
-- **Toxicity Filtering**: Optional LLM-based content moderation
-- **Topic Restriction**: Limit queries to specific domains
+- Prompt injection detection (14+ attack patterns)
+- PII auto-redaction (email, phone, SSN, credit card)
+- Input validation (length, special characters, empty input)
+- Topic restriction and toxicity filtering (LLM-based)
 
-### 📄 Multi-Format Document Support
-PDF, TXT, DOCX, CSV, Markdown, JSON with automatic chunking and metadata extraction.
+### 🔍 Web Search Fallback
+Enabled by default. Corrective, Agentic, and Adaptive architectures can fall back to web search when local documents aren't relevant. Toggle via CLI or config.
 
-### ⚡ Smart Retrieval
-- **Similarity Threshold Filtering**: Only use relevant documents (configurable score threshold)
-- **Stateful Ingestion**: File hash tracking to avoid reprocessing unchanged documents
-- **Nested Folder Support**: Recursively scans subdirectories
+### 📊 Monitoring (Optional)
+LangSmith tracing auto-enables when `LANGSMITH_API_KEY` is set:
+```bash
+export LANGSMITH_API_KEY=your_key
+export LANGCHAIN_TRACING_V2=true
+export LANGCHAIN_PROJECT=ModularRAG
+```
 
 ---
 
-### General Workflow
-
-```mermaid
-graph TB
-    subgraph "1️⃣ Document Ingestion"
-        A[Your Documents<br/>PDFs, TXT, DOCX, MD] -->|Hash Tracking| B[Ingestion Pipeline]
-        B -->|Chunk & Embed| C[(Vector Database<br/>ChromaDB/Pinecone)]
-    end
-    
-    subgraph "2️⃣ Query Processing"
-        D[User Question] -->|Input Validation| E[Guardrails]
-        E -->|Embed Query| F[Similarity Search]
-        F -->|Retrieve Context| C
-    end
-    
-    subgraph "3️⃣ Response Generation"
-        C -->|Top-K Relevant Chunks| G[LLM<br/>OpenAI/Gemini/Ollama]
-        H[Conversation History] -->|Context| G
-        G -->|PII Detection| I[Output Guardrails]
-        I -->|Final Answer| J[User]
-    end
-    
-    D -.->|No Relevant Docs| G
-    
-```
-
-**Key Concepts:**
-- **Ingestion**: Documents are chunked, embedded (converted to vectors), and stored in a vector database
-- **Retrieval**: User queries are embedded and matched against stored chunks using similarity search
-- **Generation**: The LLM uses retrieved context + conversation history to generate accurate responses
-- **Guardrails**: Built-in safety checks prevent prompt injection, filter PII, and enforce content policies
-
----
-
-## 🔗 Integration into Your Application
-ModularRAG can be used as a Python library in your existing applications.
-### Method 1: Direct Import (Development)
-```python
-from src.core.rag_pipeline import RAGPipeline
-
-# Initialize the pipeline (loads config from settings.yaml)
-pipeline = RAGPipeline(verbose=True)
-
-# Run a query
-response = pipeline.run("What is the return policy?", session_id="user_123")
-print(response)
-
-# Queries automatically include:
-# - Input validation (guardrails)
-# - Conversation history (session-based)
-# - Document retrieval (if relevant docs exist)
-# - PII redaction (output guardrails)
-```
-
-### Method 2: Install as Package
-```bash
-# Install from GitHub
-uv pip install git+https://github.com/vk2git/ModularRAG.git
-
-# OR install locally
-uv pip install .
-```
-
-Then in your code:
-```python
-from modular_rag import RAGPipeline
-
-pipeline = RAGPipeline()
-response = pipeline.run("Your question here")
-```
-
----
-## 🔄 Upgrading ModularRAG
-When new features or bug fixes are released:
-### For Git Users (Recommended)
-```bash
-# Navigate to your ModularRAG directory
-cd ModularRAG
-
-# Pull the latest changes
-git pull origin main
-
-# Update dependencies
-uv sync  # or: pip install -r requirements.txt --upgrade
-```
-
-### For Package Users
-
-```bash
-# Reinstall from GitHub
-uv pip install --upgrade git+https://github.com/vk2git/ModularRAG.git
-
-# OR if installed locally
-cd ModularRAG
-git pull origin main
-uv pip install --upgrade .
-```
-
-
----
-## 👩‍💻 For Developers & Contributors
-### Development Setup
-
-```bash
-# Clone and enter directory
-git clone https://github.com/vk2git/ModularRAG.git
-cd ModularRAG
-
-# Install in editable mode with dev dependencies
-uv pip install -e ".[dev]"
-```
-
-### Project Structure
+## 📁 Project Structure
 
 ```
 ModularRAG/
 ├── config/
-│   └── settings.yaml          # Central configuration
+│   ├── settings.yaml              # Global configuration
+│   └── architectures/             # Per-architecture configs
+│       ├── naive.yaml
+│       ├── advanced.yaml
+│       ├── corrective.yaml
+│       ├── self_rag.yaml
+│       ├── agentic.yaml
+│       ├── adaptive.yaml
+│       └── graph_rag.yaml
 ├── src/
 │   ├── core/
-│   │   ├── llm.py             # LLMFactory (plug-and-play LLMs)
-│   │   ├── embedding.py       # EmbeddingFactory
-│   │   ├── vector_store.py    # VectorStoreFactory
-│   │   ├── memory.py          # MemoryFactory (Window/Summary/Vector)
-│   │   ├── rag_pipeline.py    # Main RAG orchestration
-│   │   ├── guardrails/        # Modular validators
-│   │   │   ├── manager.py
-│   │   │   ├── prompt_injection.py
-│   │   │   ├── pii_detector.py
-│   │   │   └── ...
-│   │   └── ingestion/
-│   │       ├── manager.py     # Scans folders, tracks state
-│   │       └── processor.py   # Loads & chunks documents
+│   │   ├── components/            # Shared modular components
+│   │   │   ├── llm.py             # LLMFactory
+│   │   │   ├── embedding.py       # EmbeddingFactory
+│   │   │   ├── vector_store.py    # VectorStoreFactory
+│   │   │   ├── memory.py          # MemoryFactory
+│   │   │   ├── retriever.py       # RetrieverFactory (basic/hybrid/reranked)
+│   │   │   ├── reranker.py        # RerankerFactory (cross-encoder/cohere)
+│   │   │   └── web_search.py      # WebSearchTool (tavily/duckduckgo)
+│   │   ├── architectures/         # RAG architecture implementations
+│   │   │   ├── base.py            # BaseArchitecture (abstract)
+│   │   │   ├── naive.py           # Naive RAG
+│   │   │   ├── advanced.py        # Advanced RAG
+│   │   │   ├── corrective.py      # Corrective RAG (CRAG)
+│   │   │   ├── self_rag.py        # Self-RAG
+│   │   │   ├── agentic.py         # Agentic RAG
+│   │   │   ├── adaptive.py        # Adaptive RAG
+│   │   │   └── graph_rag.py       # Graph RAG
+│   │   ├── registry.py            # Architecture discovery & management
+│   │   ├── runner.py              # Unified pipeline runner
+│   │   ├── guardrails/            # Input/output validation
+│   │   └── ingestion/             # Document processing pipeline
 │   └── utils/
-│       ├── config_loader.py   # YAML config parser
-│       └── class_loader.py    # Dynamic plugin loader
-├── tests/                     # Unit & integration tests
-├── documents/                 # Put your PDFs/TXTs here
-└── main.py                    # CLI entry point
+│       ├── config_loader.py       # YAML config parser
+│       ├── class_loader.py        # Dynamic plugin loader
+│       └── file_utils.py          # File hashing utilities
+├── main.py                        # CLI entry point
+└── documents/                     # Your documents go here
 ```
 
+---
+
+## 🏗️ Architecture Details
+
+### Naive RAG
+Simple linear pipeline: Query → Embed → Retrieve → Generate.
+```mermaid
+graph LR
+    Q[Query] --> E[Embed] --> R[Retrieve Top-K] --> G[Generate] --> A[Answer]
+```
+
+### Advanced RAG  
+Adds query rewriting, hybrid search, and reranking.
+```mermaid
+graph LR
+    Q[Query] --> RW[Rewrite Query] --> HR[Hybrid Retrieve] --> RR[Rerank] --> G[Generate] --> A[Answer]
+```
+
+### Corrective RAG (CRAG)
+Grades retrieved documents; falls back to query rewriting or web search.
+```mermaid
+graph TD
+    Q[Query] --> R[Retrieve]
+    R --> GD[Grade Documents]
+    GD -->|Relevant| G[Generate]
+    GD -->|Not Relevant| RW[Rewrite Query]
+    RW --> R
+    GD -->|Max Retries| WS[Web Search]
+    WS --> G
+    G --> A[Answer]
+```
+
+### Self-RAG
+Self-reflective: generates, then checks for hallucination and answer quality.
+```mermaid
+graph TD
+    Q[Query] --> R[Retrieve]
+    R --> G[Generate]
+    G --> CH[Check Hallucination]
+    CH -->|Grounded| CA[Check Answer]
+    CH -->|Not Grounded| RW[Rewrite]
+    CA -->|Useful| A[Answer]
+    CA -->|Not Useful| RW
+    RW --> R
+```
+
+### Agentic RAG
+An LLM agent with tools that decides when and how to retrieve.
+```mermaid
+graph TD
+    Q[Query] --> Agent[LLM Agent]
+    Agent -->|Needs Info| T1[Retrieve Docs]
+    Agent -->|Needs More| T2[Web Search]
+    T1 --> Agent
+    T2 --> Agent
+    Agent -->|Has Enough| A[Answer]
+```
+
+### Adaptive RAG
+Routes queries to the best architecture based on complexity.
+```mermaid
+graph TD
+    Q[Query] --> C[Classify Complexity]
+    C -->|Simple| N[Naive RAG]
+    C -->|Moderate| ADV[Advanced RAG]
+    C -->|Complex| CR[Corrective RAG]
+    C -->|Exploratory| AG[Agentic RAG]
+```
+
+### Graph RAG
+Combines knowledge graph traversal with vector similarity search.
+```mermaid
+graph TD
+    Q[Query] --> VS[Vector Search]
+    Q --> GS[Graph Search<br/>Cypher Query]
+    VS --> M[Merge Context]
+    GS --> M
+    M --> G[Generate] --> A[Answer]
+```
+
+---
+
+## 🔗 Integration into Your Application
+
+### Direct Import
+```python
+from src.core.runner import PipelineRunner
+
+# Use default architecture from config
+runner = PipelineRunner()
+
+# Or specify an architecture
+runner = PipelineRunner("advanced", verbose=True)
+
+# Run a query
+response = runner.run("What is the return policy?", session_id="user_123")
+
+# Switch architecture at runtime
+runner.switch_architecture("corrective")
+```
+
+### Install as Package
+```bash
+uv pip install git+https://github.com/vk2git/ModularRAG.git
+```
+
+---
+
+## 👩‍💻 For Developers & Contributors
+
+### Adding a Custom Architecture
+1. Create `src/core/architectures/my_arch.py`:
+```python
+from src.core.architectures.base import BaseArchitecture
+
+class MyCustomRAG(BaseArchitecture):
+    name = "my_custom"
+    display_name = "My Custom RAG"
+    description = "My custom RAG implementation"
+    requires = []  # Optional dependencies
+
+    def run(self, query: str, session_id: str = "default") -> str:
+        # Your implementation here
+        pass
+```
+
+2. Register it in `src/core/registry.py`
+3. Create `config/architectures/my_custom.yaml`
+
 ### Adding Custom Components
-ModularRAG supports **custom plugins** for LLMs, embeddings, vector stores, memory, and guardrails.
+Same plugin system as before — see `config/settings.yaml` for examples of custom LLMs, embeddings, vector stores, and memory backends.
 
-**Example: Custom LLM**
-1. Create `src/plugins/my_llm.py`:
-   ```python
-   from langchain_core.language_models import BaseChatModel
-   
-   class MyCustomLLM(BaseChatModel):
-       def _generate(self, messages, stop=None, **kwargs):
-           # Your custom logic
-           pass
-   ```
-
-2. Update `config/settings.yaml`:
-   ```yaml
-   llm:
-     mode: "custom"
-     custom:
-       module_path: "src.plugins.my_llm"
-       class_name: "MyCustomLLM"
-       kwargs:
-         temperature: 0.7
-   ```
-
-### Contributing Guidelines
-We welcome contributions! Here's how:
-1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
-3. **Make your changes** and add tests
-4. **Run tests**: `uv run pytest tests/`
-5. **Commit**: `git commit -m 'Add amazing feature'`
-6. **Push**: `git push origin feature/amazing-feature`
-7. **Open a Pull Request** with a clear description
-
-**Code Style:**
-- Follow PEP 8
-- Add docstrings to all public functions/classes
-- Include type hints
-- Write tests for new features
+### Contributing
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make changes and add tests
+4. Commit: `git commit -m 'Add amazing feature'`
+5. Push and open a Pull Request
 
 ---
-## 🗺️ Roadmap & Planned Features
 
-- [ ] **FastAPI REST Endpoints** (v2.0)  
-  HTTP API for remote integrations with Swagger docs
-- [ ] **Async Ingestion**  
-  Background processing for large document sets
-- [ ] **GraphRAG Support**  
-  Knowledge graph extraction for better context understanding
-- [ ] **Parallel Document Processing**  
-  Multi-threaded/multi-process ingestion for speed
-- [ ] **Database Connectors**  
-  Ingest directly from SQL/NoSQL databases (Postgres, MongoDB)
-- [ ] **Web UI**  
-  Streamlit/Next.js interface for non-developers
-- [ ] **Multi-Tenancy**  
-  Support for multiple isolated knowledge bases
-- [ ] **Advanced Chunking Strategies**  
-  Smart chunking based on document structure (headers, sections)
-- [ ] **Query Rewriting**  
-  Automatic query expansion and reformulation
-- [ ] **Citation Tracking**  
-  Show which document chunks were used in the response
-- [ ] **Cost Tracking**  
-  Monitor API usage and token costs for cloud providers
-
----
-### 💡 Ideas & Proposals
-Have a feature request? [Open an issue](https://github.com/vk2git/ModularRAG/issues) with the `feature-request` label
-## 🤝 Community & Support
-- **Issues**: [GitHub Issues](https://github.com/vk2git/ModularRAG/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/vk2git/ModularRAG/discussions)
 ## 🙏 Acknowledgments
 Built with:
 - [LangChain](https://langchain.com) — LLM orchestration framework
+- [LangGraph](https://langchain-ai.github.io/langgraph/) — Stateful graph workflows
 - [ChromaDB](https://www.trychroma.com) — Vector database
 - [Ollama](https://ollama.ai) — Local LLM runtime
-- [Guardrails AI](https://www.guardrailsai.com) — Safety and validation
+- [Rich](https://rich.readthedocs.io) — Beautiful terminal UI
 ---
-:)

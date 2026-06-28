@@ -1,18 +1,42 @@
-fastapi
-uvicorn
+# === Core ===
 python-dotenv
 pyyaml
+rich
+
+# === LangChain Ecosystem ===
 langchain
 langchain-community
 langchain-core
+langchain-text-splitters
+langgraph
+
+# === LLM Providers ===
 langchain-openai
 langchain_google_genai
 langchain-anthropic
+langchain-ollama
+
+# === Embeddings ===
+langchain-huggingface
+
+# === Vector Stores ===
 langchain-chroma
 chromadb
-langchain-huggingface
-guardrails-ai
+
+# === Document Processing ===
+pypdf
 docx2txt
-unstructured
 markdown
-redis
+
+# === Optional (install separately if needed) ===
+# langsmith                    # Tracing/monitoring (auto-enabled if LANGSMITH_API_KEY set)
+# llama-index-core             # Alternative retriever backend
+# llama-index-readers-file     # LlamaIndex file readers
+# sentence-transformers        # Cross-encoder reranking (for Advanced RAG)
+# langchain-cohere             # Cohere reranker (for Advanced RAG, requires API key)
+# tavily-python                # Web search fallback (for Corrective/Adaptive RAG)
+# duckduckgo-search            # Free web search fallback alternative
+# redis                        # Redis memory backend
+# langchain-pinecone           # Pinecone vector store
+# neo4j                        # Graph database (for Graph RAG)
+# langchain-neo4j              # LangChain Neo4j integration

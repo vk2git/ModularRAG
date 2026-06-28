@@ -1,0 +1,11 @@
+# Corrective RAG (CRAG) Configuration
+# Grades retrieved docs, rewrites query or falls back to web search
+
+# Number of documents to retrieve per attempt
+top_k: 5
+
+# Maximum query rewrite attempts before falling back to web search
+max_retries: 2
+
+# Enable web search fallback when local docs aren't relevant
+web_search: true

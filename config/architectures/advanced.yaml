@@ -1,0 +1,11 @@
+# Advanced RAG Configuration
+# Query rewriting + hybrid search + reranking
+
+# Enable/disable query rewriting before retrieval
+query_rewrite: true
+
+# Retriever strategy: basic, hybrid, or reranked
+retriever_strategy: "reranked"
+
+# Number of final documents after reranking
+top_k: 5

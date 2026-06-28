@@ -6,7 +6,6 @@ dist/
 wheels/
 *.egg-info
 
-
 # Virtual environments
 .venv
 env/
@@ -33,3 +32,4 @@ documents/
 # IDE settings
 .vscode/
 .idea/
+.gemini/

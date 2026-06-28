@@ -1,0 +1,8 @@
+# Self-RAG Configuration
+# Self-reflective generation with hallucination checks and retries
+
+# Number of documents to retrieve
+top_k: 5
+
+# Maximum reflection/retry iterations
+max_iterations: 3

@@ -1,5 +1,5 @@
-from src.core.embedding import EmbeddingFactory
-from src.core.vector_store import VectorStoreFactory
+from src.core.components.embedding import EmbeddingFactory
+from src.core.components.vector_store import VectorStoreFactory
 from src.core.ingestion.processor import DocumentProcessor
 from src.utils.file_utils import calculate_file_hash
 import os

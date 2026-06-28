@@ -1,0 +1,11 @@
+# Naive RAG Configuration
+# Simple retrieve → generate. Fast, lightweight.
+
+# Score threshold for document relevance (lower = stricter for cosine/euclidean)
+score_threshold: 1.5
+
+# Number of documents to retrieve
+top_k: 3
+
+# Fallback to general chat when no relevant docs found
+fallback_to_general_chat: true

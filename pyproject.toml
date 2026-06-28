@@ -1,14 +1,58 @@
 [project]
-name = "rag-tool"
-version = "0.1.0"
-description = "Add your description here"
+name = "modular-rag"
+version = "2.0.0"
+description = "Multi-architecture RAG platform with swappable components"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "python-dotenv",
+    "pyyaml",
+    "rich",
+    "langchain",
+    "langchain-community",
+    "langchain-core",
+    "langchain-text-splitters",
+    "langgraph",
+    "langchain-openai",
+    "langchain-google-genai",
+    "langchain-anthropic",
+    "langchain-ollama",
     "langchain-huggingface>=1.0.1",
-    "langchain-ollama>=1.0.0",
-    "langchain-pinecone>=0.2.13",
+    "langchain-chroma",
+    "chromadb",
     "pypdf>=6.3.0",
+    "docx2txt",
+    "markdown",
+]
+
+[project.optional-dependencies]
+rerank = [
+    "sentence-transformers",
+    "langchain-cohere",
+]
+search = [
+    "tavily-python",
+    "duckduckgo-search",
+]
+graph = [
+    "neo4j",
+    "langchain-neo4j",
+]
+monitoring = [
+    "langsmith",
+]
+llamaindex = [
+    "llama-index-core",
+    "llama-index-readers-file",
+]
+pinecone = [
+    "langchain-pinecone>=0.2.13",
+]
+redis = [
+    "redis",
+]
+all = [
+    "modular-rag[rerank,search,graph,monitoring,llamaindex,pinecone,redis]",
 ]
 
 [build-system]
