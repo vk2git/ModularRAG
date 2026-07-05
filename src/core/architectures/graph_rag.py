@@ -28,7 +28,8 @@ class GraphRAG(BaseArchitecture):
     name = "graph_rag"
     display_name = "Graph RAG"
     description = "Knowledge graph + vector hybrid retrieval for relationship-aware answers."
-    requires = ["neo4j"]
+    requires = []
+    optional_deps = ["neo4j"]  # Falls back to vector-only without Neo4j
 
     def __init__(self, components, config, verbose=False):
         super().__init__(components, config, verbose)

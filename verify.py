@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
-"""Quick verification script for ModularRAG v2 structure."""
+"""
+Quick verification script for ModularRAG v2.
+
+Run with: uv run python verify.py
+"""
 
 import sys
+
 errors = []
 
-# 1. Test config loader
+# 1. Config loader
 try:
     from src.utils.config_loader import load_config, load_architecture_config, get_active_architecture
     config = load_config()
@@ -14,7 +19,7 @@ except Exception as e:
     errors.append(f"❌ Config loader: {e}")
     print(errors[-1])
 
-# 2. Test registry
+# 2. Registry
 try:
     from src.core.registry import ArchitectureRegistry
     registry = ArchitectureRegistry()
@@ -26,7 +31,7 @@ except Exception as e:
     errors.append(f"❌ Registry: {e}")
     print(errors[-1])
 
-# 3. Test architecture configs
+# 3. Architecture configs
 try:
     for name in ["naive", "advanced", "corrective", "self_rag", "agentic", "adaptive", "graph_rag"]:
         cfg = load_architecture_config(name)
@@ -36,7 +41,7 @@ except Exception as e:
     errors.append(f"❌ Architecture configs: {e}")
     print(errors[-1])
 
-# 4. Test component imports
+# 4. Component imports
 try:
     from src.core.components import LLMFactory, EmbeddingFactory, VectorStoreFactory, MemoryFactory
     from src.core.components.retriever import RetrieverFactory
@@ -47,7 +52,7 @@ except Exception as e:
     errors.append(f"❌ Component imports: {e}")
     print(errors[-1])
 
-# 5. Test backwards compatibility
+# 5. Backwards compatibility
 try:
     from src.core.llm import LLMFactory as LF1
     from src.core.embedding import EmbeddingFactory as EF1
@@ -58,7 +63,7 @@ except Exception as e:
     errors.append(f"❌ Backwards compatibility: {e}")
     print(errors[-1])
 
-# 6. Test runner import
+# 6. Runner import
 try:
     from src.core.runner import PipelineRunner
     print("✅ PipelineRunner import OK")

@@ -55,12 +55,22 @@ class ArchitectureRegistry:
         architectures = []
         for name, cls in _ARCHITECTURE_CLASSES.items():
             req_check = self._check_requirements(cls)
+            opt_check = self._check_optional_deps(cls)
+
+            if not req_check["available"]:
+                status = f"❌ Missing: {', '.join(req_check['missing'])}"
+            elif opt_check["missing"]:
+                status = f"✅ Ready (optional: {', '.join(opt_check['missing'])} not installed)"
+            else:
+                status = "✅ Ready"
+
             architectures.append({
                 "name": cls.name,
                 "display_name": cls.display_name,
                 "description": cls.description,
                 "requires": cls.requires,
-                "status": "✅ Ready" if req_check["available"] else f"⚠️  Missing: {', '.join(req_check['missing'])}",
+                "optional_deps": cls.optional_deps,
+                "status": status,
                 "available": req_check["available"],
             })
         return architectures
@@ -98,11 +108,21 @@ class ArchitectureRegistry:
             return False
 
     def _check_requirements(self, cls: Type[BaseArchitecture]) -> Dict:
-        """Check if optional dependencies for an architecture are installed."""
+        """Check if hard dependencies for an architecture are installed."""
         missing = []
         for req in cls.requires:
             try:
                 __import__(req.replace("-", "_"))
             except ImportError:
                 missing.append(req)
+        return {"available": len(missing) == 0, "missing": missing}
+
+    def _check_optional_deps(self, cls: Type[BaseArchitecture]) -> Dict:
+        """Check if optional (soft) dependencies are installed."""
+        missing = []
+        for dep in cls.optional_deps:
+            try:
+                __import__(dep.replace("-", "_"))
+            except ImportError:
+                missing.append(dep)
         return {"available": len(missing) == 0, "missing": missing}

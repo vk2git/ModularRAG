@@ -10,15 +10,15 @@
 
 ModularRAG supports **7 RAG architectures**, each suited for different use cases:
 
-| Architecture | Description | Best For |
-|---|---|---|
-| **Naive RAG** | Simple retrieve → generate | POCs, demos, simple Q&A |
-| **Advanced RAG** | Query rewriting + hybrid search + reranking | Production systems |
-| **Corrective RAG** | Grades docs, rewrites or falls back to web search | High-accuracy requirements |
-| **Self-RAG** | Self-reflective generation with hallucination checks | Critical applications |
-| **Agentic RAG** | LLM agent with tools for iterative reasoning | Multi-hop questions |
-| **Adaptive RAG** | Auto-routes queries to the best architecture | Cost/performance optimization |
-| **Graph RAG** | Knowledge graph + vector hybrid retrieval | Relationship-heavy data |
+| Architecture | Description | Best For | Documentation |
+|---|---|---|---|
+| **Naive RAG** | Simple retrieve → generate | POCs, demos, simple Q&A | [Docs](docs/architectures/naive-rag.md) |
+| **Advanced RAG** | Query rewriting + hybrid search + reranking | Production systems | [Docs](docs/architectures/advanced-rag.md) |
+| **Corrective RAG** | Grades docs, rewrites or falls back to web search | High-accuracy requirements | [Docs](docs/architectures/corrective-rag.md) |
+| **Self-RAG** | Self-reflective generation with hallucination checks | Critical applications | [Docs](docs/architectures/self-rag.md) |
+| **Agentic RAG** | LLM agent with tools for iterative reasoning | Multi-hop questions | [Docs](docs/architectures/agentic-rag.md) |
+| **Adaptive RAG** | Auto-routes queries to the best architecture | Cost/performance optimization | [Docs](docs/architectures/adaptive-rag.md) |
+| **Graph RAG** | Knowledge graph + vector hybrid retrieval | Relationship-heavy data | [Docs](docs/architectures/graph-rag.md) |
 
 ```mermaid
 graph TD
@@ -238,21 +238,23 @@ ModularRAG/
 
 ## 🏗️ Architecture Details
 
-### Naive RAG
+*For comprehensive information on each architecture, including configuration options, limitations, and underlying research, please see the dedicated documentation in the `docs/architectures/` folder.*
+
+### [Naive RAG](docs/architectures/naive-rag.md)
 Simple linear pipeline: Query → Embed → Retrieve → Generate.
 ```mermaid
 graph LR
     Q[Query] --> E[Embed] --> R[Retrieve Top-K] --> G[Generate] --> A[Answer]
 ```
 
-### Advanced RAG  
+### [Advanced RAG](docs/architectures/advanced-rag.md)
 Adds query rewriting, hybrid search, and reranking.
 ```mermaid
 graph LR
     Q[Query] --> RW[Rewrite Query] --> HR[Hybrid Retrieve] --> RR[Rerank] --> G[Generate] --> A[Answer]
 ```
 
-### Corrective RAG (CRAG)
+### [Corrective RAG (CRAG)](docs/architectures/corrective-rag.md)
 Grades retrieved documents; falls back to query rewriting or web search.
 ```mermaid
 graph TD
@@ -266,7 +268,7 @@ graph TD
     G --> A[Answer]
 ```
 
-### Self-RAG
+### [Self-RAG](docs/architectures/self-rag.md)
 Self-reflective: generates, then checks for hallucination and answer quality.
 ```mermaid
 graph TD
@@ -280,7 +282,7 @@ graph TD
     RW --> R
 ```
 
-### Agentic RAG
+### [Agentic RAG](docs/architectures/agentic-rag.md)
 An LLM agent with tools that decides when and how to retrieve.
 ```mermaid
 graph TD
@@ -292,7 +294,7 @@ graph TD
     Agent -->|Has Enough| A[Answer]
 ```
 
-### Adaptive RAG
+### [Adaptive RAG](docs/architectures/adaptive-rag.md)
 Routes queries to the best architecture based on complexity.
 ```mermaid
 graph TD
@@ -303,7 +305,7 @@ graph TD
     C -->|Exploratory| AG[Agentic RAG]
 ```
 
-### Graph RAG
+### [Graph RAG](docs/architectures/graph-rag.md)
 Combines knowledge graph traversal with vector similarity search.
 ```mermaid
 graph TD
@@ -313,6 +315,30 @@ graph TD
     GS --> M
     M --> G[Generate] --> A[Answer]
 ```
+
+---
+
+## 🧪 Testing Architectures
+
+To see the inner workings of each architecture, we highly recommend using the `--verbose` flag. This will output the intermediate steps, LLM reasoning, document scores, and grading logic to the console.
+
+**1. Basic Testing:**
+```bash
+# Run a specific architecture in verbose mode
+uv run main.py --arch <architecture_name> --verbose
+```
+
+**2. Architecture-Specific Testing Strategies:**
+
+- **Naive RAG:** Test basic retrieval. Ensure documents below the similarity threshold (configured in `config/architectures/naive.yaml`) are correctly excluded.
+- **Advanced RAG:** Ask a question using different terminology than what's in your documents. Watch the LLM rewrite your query to optimize it for retrieval, and observe the cross-encoder re-scoring the documents.
+- **Corrective RAG (CRAG):** Ask an ambiguous question. Watch the system grade the retrieved documents, realize they aren't relevant, and automatically retry with a rewritten query or fall back to a live web search.
+- **Self-RAG:** Ask a complex question designed to confuse the model. Watch the post-generation hallucination and usefulness checks catch errors and trigger a retry loop.
+- **Agentic RAG:** Ask a multi-hop question (e.g., "Compare X with Y"). Watch the agent autonomously decide to use the `retrieve_documents` tool multiple times before generating a final answer.
+- **Adaptive RAG:** Ask a mix of simple factual questions and complex analytical questions. Watch the upfront LLM classifier dynamically route the simple questions to Naive RAG and complex questions to Corrective/Agentic RAG.
+- **Graph RAG:** Ask a question about the relationships between entities in your documents. Watch the system generate and execute a Cypher query against Neo4j to pull structured relationships, merging it with vector data.
+
+For detailed testing scenarios and expected outputs for each architecture, check their respective documentation pages.
 
 ---
 

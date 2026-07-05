@@ -23,7 +23,8 @@ class BaseArchitecture(ABC):
     name: str = ""                  # e.g., "naive"
     display_name: str = ""          # e.g., "Naive RAG"
     description: str = ""           # One-line description
-    requires: list = []             # Optional pip extras needed, e.g., ["langgraph"]
+    requires: list = []             # Hard dependencies that block usage, e.g., ["langgraph"]
+    optional_deps: list = []        # Soft dependencies that enhance but aren't required, e.g., ["neo4j"]
 
     def __init__(self, components: Dict[str, Any], config: Dict[str, Any], verbose: bool = False):
         """
