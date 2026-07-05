@@ -27,15 +27,15 @@
 
 ### Step-by-Step Flow
 
-1. **Input Validation** — Query passes through guardrails
+1. **Input Validation** - Query passes through guardrails
 2. **Parallel Retrieval**:
    - **Vector Search**: Performs standard similarity search in ChromaDB to find semantically relevant text chunks.
    - **Graph Search**: 
      - The LLM translates the natural language query into a Cypher query (using the graph schema for context).
      - The Cypher query is executed against the Neo4j database to find related nodes and edges.
-3. **Context Merging** — The raw text chunks and the structured graph relationships are concatenated into a single hybrid context block.
-4. **Generation** — The LLM generates a response, explicitly instructed to use the graph connections to "connect the dots" across the text chunks.
-5. **Output Validation** — Response passes through output guardrails
+3. **Context Merging** - The raw text chunks and the structured graph relationships are concatenated into a single hybrid context block.
+4. **Generation** - The LLM generates a response, explicitly instructed to use the graph connections to "connect the dots" across the text chunks.
+5. **Output Validation** - Response passes through output guardrails
 
 ### When to Use
 
@@ -137,7 +137,7 @@ Graph RAG is only as good as the data in the graph. During the ingestion phase (
 Source: [`src/core/architectures/graph_rag.py`](../../src/core/architectures/graph_rag.py)
 
 Key classes and methods:
-- `GraphRAG` — Main architecture class
-- `_init_graph_store()` — Connects to Neo4j
-- `_query_knowledge_graph()` — Translates NL to Cypher and executes
-- `extract_and_store_entities()` — Called during ingestion to build the graph
+- `GraphRAG` - Main architecture class
+- `_init_graph_store()` - Connects to Neo4j
+- `_query_knowledge_graph()` - Translates NL to Cypher and executes
+- `extract_and_store_entities()` - Called during ingestion to build the graph

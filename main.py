@@ -108,7 +108,7 @@ def select_architecture():
     for i, arch in enumerate(architectures, 1):
         marker = " [bold green]← current[/bold green]" if arch["name"] == current else ""
         status = "✅" if arch["available"] else "⚠️"
-        console.print(f"  {status} [bold]{i}.[/bold] {arch['display_name']} — {arch['description']}{marker}")
+        console.print(f"  {status} [bold]{i}.[/bold] {arch['display_name']} - {arch['description']}{marker}")
 
     console.print()
 
@@ -293,7 +293,7 @@ def run_chat(architecture: str = None, verbose: bool = False):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="ModularRAG — Multi-Architecture RAG Platform",
+        description="ModularRAG - Multi-Architecture RAG Platform",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

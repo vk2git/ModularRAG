@@ -74,8 +74,6 @@ class MemoryFactory:
             return self._create_local_history(session_id)
         elif provider == "redis":
             return self._create_redis_history(session_id)
-        elif provider == "custom":
-            return self._create_custom_history(session_id)
         else:
              raise ValueError(f"Unsupported memory provider: {provider}")
 
@@ -100,19 +98,7 @@ class MemoryFactory:
             ttl=ttl
         )
 
-    def _create_custom_history(self, session_id: str) -> BaseChatMessageHistory:
-        from src.utils.class_loader import instantiate_class
-        
-        custom_conf = self.memory_config.get("custom", {})
-        module_path = custom_conf.get("module_path")
-        class_name = custom_conf.get("class_name")
-        kwargs = custom_conf.get("kwargs", {})
-        
-        if not module_path or not class_name:
-            raise ValueError("Custom Memory config requires 'module_path' and 'class_name'")
-            
-        print(f"Initializing Custom Memory: {class_name} from {module_path} (Session: {session_id})")
-        return instantiate_class(module_path, class_name, session_id=session_id, **kwargs)
+
 
     def create_vector_memory(self, vector_store, k: int = 5):
         """

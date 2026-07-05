@@ -167,7 +167,7 @@ class SelfRAG(BaseArchitecture):
         self._log("---- Checking for hallucinations...")
 
         if not state["documents"]:
-            self._log("   No documents to check against — skipping hallucination check")
+            self._log("   No documents to check against - skipping hallucination check")
             return {"is_grounded": True}
 
         context = "\n\n".join([doc.page_content for doc in state["documents"]])

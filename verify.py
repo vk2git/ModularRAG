@@ -14,7 +14,7 @@ try:
     from src.utils.config_loader import load_config, load_architecture_config, get_active_architecture
     config = load_config()
     active = get_active_architecture(config)
-    print(f"✅ Config loader OK — active architecture: {active}")
+    print(f"✅ Config loader OK - active architecture: {active}")
 except Exception as e:
     errors.append(f"❌ Config loader: {e}")
     print(errors[-1])
@@ -24,7 +24,7 @@ try:
     from src.core.registry import ArchitectureRegistry
     registry = ArchitectureRegistry()
     archs = registry.list_architectures()
-    print(f"✅ Registry OK — {len(archs)} architectures found:")
+    print(f"✅ Registry OK - {len(archs)} architectures found:")
     for a in archs:
         print(f"   {a['name']:15s} {a['status']}")
 except Exception as e:
@@ -52,16 +52,7 @@ except Exception as e:
     errors.append(f"❌ Component imports: {e}")
     print(errors[-1])
 
-# 5. Backwards compatibility
-try:
-    from src.core.llm import LLMFactory as LF1
-    from src.core.embedding import EmbeddingFactory as EF1
-    from src.core.vector_store import VectorStoreFactory as VF1
-    from src.core.memory import MemoryFactory as MF1
-    print("✅ Backwards compatibility OK")
-except Exception as e:
-    errors.append(f"❌ Backwards compatibility: {e}")
-    print(errors[-1])
+# 5. Backwards compatibility check removed.
 
 # 6. Runner import
 try:

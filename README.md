@@ -1,8 +1,8 @@
 # ModularRAG
 
-**A multi-architecture RAG platform** designed for flexibility and ease of integration. Choose from 7 RAG architecture types, each with fully swappable components — from the LLM to the vector database to memory management — configurable via simple YAML files. No code changes required.
+**A multi-architecture RAG platform** designed for flexibility and ease of integration. Choose from 7 RAG architecture types, each with fully swappable components - from the LLM to the vector database to memory management - configurable via simple YAML files. No code changes required.
 
-> **Design Decision — Framework Choice**: LangChain is the primary orchestration framework. LlamaIndex is supported as an optional retriever backend (install with `uv pip install 'modular-rag[llamaindex]'`). This avoids dual-framework dependency issues while allowing users who prefer LlamaIndex's data connectors to plug them in. LangGraph powers the advanced graph-based architectures (Corrective, Self-RAG, Agentic, Adaptive).
+> **Design Decision - Framework Choice**: LangChain is the primary orchestration framework. LlamaIndex is supported as an optional retriever backend (install with `uv pip install 'modular-rag[llamaindex]'`). This avoids dual-framework dependency issues while allowing users who prefer LlamaIndex's data connectors to plug them in. LangGraph powers the advanced graph-based architectures (Corrective, Self-RAG, Agentic, Adaptive).
 
 ---
 
@@ -390,7 +390,7 @@ class MyCustomRAG(BaseArchitecture):
 3. Create `config/architectures/my_custom.yaml`
 
 ### Adding Custom Components
-Same plugin system as before — see `config/settings.yaml` for examples of custom LLMs, embeddings, vector stores, and memory backends.
+Same plugin system as before - see `config/settings.yaml` for examples of custom LLMs, embeddings, vector stores, and memory backends.
 
 ### Contributing
 1. Fork the repository
@@ -403,9 +403,9 @@ Same plugin system as before — see `config/settings.yaml` for examples of cust
 
 ## 🙏 Acknowledgments
 Built with:
-- [LangChain](https://langchain.com) — LLM orchestration framework
-- [LangGraph](https://langchain-ai.github.io/langgraph/) — Stateful graph workflows
-- [ChromaDB](https://www.trychroma.com) — Vector database
-- [Ollama](https://ollama.ai) — Local LLM runtime
-- [Rich](https://rich.readthedocs.io) — Beautiful terminal UI
+- [LangChain](https://langchain.com) - LLM orchestration framework
+- [LangGraph](https://langchain-ai.github.io/langgraph/) - Stateful graph workflows
+- [ChromaDB](https://www.trychroma.com) - Vector database
+- [Ollama](https://ollama.ai) - Local LLM runtime
+- [Rich](https://rich.readthedocs.io) - Beautiful terminal UI
 ---

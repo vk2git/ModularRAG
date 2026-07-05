@@ -174,7 +174,7 @@ class CorrectiveRAG(BaseArchitecture):
         if state["documents"]:
             return "generate"
 
-        # No relevant docs — check if we should retry or web search
+        # No relevant docs - check if we should retry or web search
         if state["retries"] < state["max_retries"]:
             return "rewrite"
 

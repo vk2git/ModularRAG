@@ -1,5 +1,5 @@
 """
-Retriever factory — provides different retrieval strategies.
+Retriever factory - provides different retrieval strategies.
 
 Strategies:
 - basic: Simple top-K vector similarity search

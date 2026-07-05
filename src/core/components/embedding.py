@@ -1,7 +1,5 @@
 import os
 from src.utils.config_loader import load_config
-from src.utils.class_loader import instantiate_class
-
 class EmbeddingFactory:
     def __init__(self):
         self.config = load_config()
@@ -34,16 +32,5 @@ class EmbeddingFactory:
             print(f"---- Loading Cloud embedding from Google: {model_name}")
             from langchain_google_genai import GoogleGenerativeAIEmbeddings
             return GoogleGenerativeAIEmbeddings(model=model_name, google_api_key=api_key)
-        elif provider == "custom":
-            custom_conf = self.embed_config.get("custom", {})
-            module_path = custom_conf.get("module_path")
-            class_name = custom_conf.get("class_name")
-            kwargs = custom_conf.get("kwargs", {})
-            
-            if not module_path or not class_name:
-                raise ValueError("Custom Embedding config requires 'module_path' and 'class_name'")
-                
-            print(f"---- Loading Custom Embeddings: {class_name} from {module_path}")
-            return instantiate_class(module_path, class_name, **kwargs)
         else:
             raise ValueError(f"Unsupported Embedding provider: {provider}")

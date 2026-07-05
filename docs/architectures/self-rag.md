@@ -27,18 +27,18 @@
 
 ### Step-by-Step Flow
 
-1. **Input Validation** — Query passes through guardrails
-2. **Retrieval** — Vector store returns top-K documents
-3. **Initial Generation** — LLM generates a first-draft answer based *only* on the context
-4. **Hallucination Check** — A second LLM call grades the generation:
+1. **Input Validation** - Query passes through guardrails
+2. **Retrieval** - Vector store returns top-K documents
+3. **Initial Generation** - LLM generates a first-draft answer based *only* on the context
+4. **Hallucination Check** - A second LLM call grades the generation:
    - "Is this answer grounded in / supported by the provided documents?"
    - If **No**: The answer is hallucinated. The query is rewritten to find better context, and the process restarts from step 2.
    - If **Yes**: Proceed to the next check.
-5. **Usefulness Check** — A third LLM call grades the generation again:
+5. **Usefulness Check** - A third LLM call grades the generation again:
    - "Does this answer actually resolve the user's question?"
    - If **No**: The answer is factually correct but unhelpful. The query is rewritten and the process restarts.
    - If **Yes**: The answer is both grounded and useful. Return it to the user.
-6. **Output Validation & Memory** — Same as other architectures
+6. **Output Validation & Memory** - Same as other architectures
 
 ### LangGraph State Machine
 
@@ -128,5 +128,5 @@ If your retrieval is noisy, use CRAG. If your LLM is prone to hallucination even
 Source: [`src/core/architectures/self_rag.py`](../../src/core/architectures/self_rag.py)
 
 Key methods:
-- `_check_hallucination()` — Groundedness grader
-- `_check_answer()` — Usefulness grader
+- `_check_hallucination()` - Groundedness grader
+- `_check_answer()` - Usefulness grader

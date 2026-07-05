@@ -1,5 +1,4 @@
 from src.utils.config_loader import load_config
-from src.utils.class_loader import instantiate_class
 import os
 
 class LLMFactory:
@@ -17,8 +16,6 @@ class LLMFactory:
             return self._create_local_llm()
         elif mode == "cloud":
             return self._create_cloud_llm()
-        elif mode == "custom":
-            return self._create_custom_llm()
         else:
             raise ValueError(f"Unsupported LLM mode: {mode}")
     
@@ -85,18 +82,3 @@ class LLMFactory:
             )
         else:
             raise ValueError(f"Unsupported Cloud Provider: {provider}")
-
-    def _create_custom_llm(self):
-        """
-        Creates a custom LLM instance from a plugin.
-        """
-        custom_conf = self.llm_config.get("custom", {})
-        module_path = custom_conf.get("module_path")
-        class_name = custom_conf.get("class_name")
-        kwargs = custom_conf.get("kwargs", {})
-        
-        if not module_path or not class_name:
-            raise ValueError("Custom LLM config requires 'module_path' and 'class_name'")
-            
-        print(f"Initializing Custom LLM: {class_name} from {module_path}")
-        return instantiate_class(module_path, class_name, **kwargs)

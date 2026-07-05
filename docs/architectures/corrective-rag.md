@@ -29,18 +29,18 @@
 
 ### Step-by-Step Flow
 
-1. **Input Validation** — Query passes through guardrails
-2. **Retrieval** — Vector store returns top-K documents
-3. **Document Grading** — Each document is individually graded by the LLM:
+1. **Input Validation** - Query passes through guardrails
+2. **Retrieval** - Vector store returns top-K documents
+3. **Document Grading** - Each document is individually graded by the LLM:
    - The LLM acts as a relevance judge, answering "Is this document relevant to the question?" with a simple yes/no
    - Only documents graded as "relevant" pass through
-4. **Decision Point** — Based on grading results:
+4. **Decision Point** - Based on grading results:
    - **Relevant docs found** → Proceed to generation
    - **No relevant docs + retries remaining** → Rewrite the query and re-retrieve
    - **No relevant docs + retries exhausted** → Fall back to web search (if enabled)
-5. **Generation** — LLM generates answer from the surviving context
-6. **Output Validation** — Response passes through output guardrails
-7. **Memory** — Interaction is saved to chat history
+5. **Generation** - LLM generates answer from the surviving context
+6. **Output Validation** - Response passes through output guardrails
+7. **Memory** - Interaction is saved to chat history
 
 ### LangGraph State Machine
 
@@ -158,8 +158,8 @@ System: You are a document relevance grader. Given a user question and a
 Source: [`src/core/architectures/corrective.py`](../../src/core/architectures/corrective.py)
 
 Key classes and methods:
-- `CorrectiveRAG` — Main architecture class
-- `_build_graph()` — Sets up the LangGraph workflow
-- `_grade_documents()` — LLM-as-judge relevance grading
-- `_decide_after_grading()` — Routing logic
-- `_web_search()` — Fallback web search using `WebSearchTool`
+- `CorrectiveRAG` - Main architecture class
+- `_build_graph()` - Sets up the LangGraph workflow
+- `_grade_documents()` - LLM-as-judge relevance grading
+- `_decide_after_grading()` - Routing logic
+- `_web_search()` - Fallback web search using `WebSearchTool`

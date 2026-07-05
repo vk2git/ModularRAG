@@ -25,15 +25,15 @@
 
 ### Step-by-Step Flow
 
-1. **Input Validation** — Query passes through guardrails
-2. **Agent Initialization** — The agent is given a system prompt, the user's query, and a list of callable tools (e.g., `retrieve_documents`, `web_search`).
+1. **Input Validation** - Query passes through guardrails
+2. **Agent Initialization** - The agent is given a system prompt, the user's query, and a list of callable tools (e.g., `retrieve_documents`, `web_search`).
 3. **Reasoning Loop** (powered by LangGraph's ReAct implementation):
    - The agent analyzes the question and decides what information it needs.
    - It calls a tool (e.g., `retrieve_documents("return policy")`).
    - The tool executes and returns context to the agent.
    - The agent reads the context. If it needs more, it might call the tool again with a different query, or try a different tool (e.g., `web_search`).
    - Once it has sufficient information, it generates the final response.
-4. **Output Validation** — Response passes through output guardrails
+4. **Output Validation** - Response passes through output guardrails
 
 ### LangGraph State Machine
 
@@ -101,9 +101,9 @@ You: Compare our internal policy on X with the current industry standard.
 
 ## Limitations and Requirements
 
-- **Model Capability** — Agentic RAG *requires* an LLM with strong tool-calling (function calling) capabilities. GPT-4, Claude 3, and Gemini perform well. Small local models (like Mistral 7B) may struggle to format tool calls correctly or get stuck in loops.
-- **Latency** — This is the slowest architecture. A complex question might require 4-5 LLM calls before generating the final answer.
-- **Cost** — More LLM calls = higher API costs.
+- **Model Capability** - Agentic RAG *requires* an LLM with strong tool-calling (function calling) capabilities. GPT-4, Claude 3, and Gemini perform well. Small local models (like Mistral 7B) may struggle to format tool calls correctly or get stuck in loops.
+- **Latency** - This is the slowest architecture. A complex question might require 4-5 LLM calls before generating the final answer.
+- **Cost** - More LLM calls = higher API costs.
 
 ---
 
@@ -112,6 +112,6 @@ You: Compare our internal policy on X with the current industry standard.
 Source: [`src/core/architectures/agentic.py`](../../src/core/architectures/agentic.py)
 
 Key classes and methods:
-- `AgenticRAG` — Main architecture class
-- `_build_tools()` — Defines the `retrieve_documents` and `web_search` tools the agent can use
-- `_build_graph()` — Instantiates the LangGraph ReAct agent
+- `AgenticRAG` - Main architecture class
+- `_build_tools()` - Defines the `retrieve_documents` and `web_search` tools the agent can use
+- `_build_graph()` - Instantiates the LangGraph ReAct agent

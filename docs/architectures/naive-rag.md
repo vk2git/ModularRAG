@@ -17,13 +17,13 @@
 
 ### Step-by-Step Flow
 
-1. **Input Validation** — Query passes through guardrails (injection detection, PII redaction)
-2. **Embedding** — Query is converted to a vector using the configured embedding model
-3. **Retrieval** — Vector store returns top-K documents ranked by similarity score
-4. **Score Filtering** — Documents below a relevance threshold are discarded
-5. **Generation** — If relevant docs exist, LLM generates an answer grounded in context. If no docs pass the threshold, falls back to general chat (LLM's own knowledge)
-6. **Output Validation** — Response passes through output guardrails
-7. **Memory** — Interaction is saved to chat history
+1. **Input Validation** - Query passes through guardrails (injection detection, PII redaction)
+2. **Embedding** - Query is converted to a vector using the configured embedding model
+3. **Retrieval** - Vector store returns top-K documents ranked by similarity score
+4. **Score Filtering** - Documents below a relevance threshold are discarded
+5. **Generation** - If relevant docs exist, LLM generates an answer grounded in context. If no docs pass the threshold, falls back to general chat (LLM's own knowledge)
+6. **Output Validation** - Response passes through output guardrails
+7. **Memory** - Interaction is saved to chat history
 
 ### When to Use
 
@@ -89,10 +89,10 @@ uv run main.py --arch naive --verbose
 
 ## Limitations
 
-- **No query optimization** — Uses the raw user query for retrieval, which may not match document terminology
-- **No relevance verification** — Trusts the vector similarity score without LLM-based grading
-- **Single retrieval pass** — No retry or fallback if the first retrieval misses
-- **Keyword blindness** — Pure semantic search may miss exact keyword matches
+- **No query optimization** - Uses the raw user query for retrieval, which may not match document terminology
+- **No relevance verification** - Trusts the vector similarity score without LLM-based grading
+- **Single retrieval pass** - No retry or fallback if the first retrieval misses
+- **Keyword blindness** - Pure semantic search may miss exact keyword matches
 
 These limitations are addressed by the more advanced architectures ([Advanced RAG](./advanced-rag.md), [Corrective RAG](./corrective-rag.md)).
 
@@ -104,7 +104,7 @@ These limitations are addressed by the more advanced architectures ([Advanced RA
 Source: [`src/core/architectures/naive.py`](../src/core/architectures/naive.py)
 
 Key classes and methods:
-- `NaiveRAG` — Main architecture class
-- `run()` — Entry point for query processing
-- `_run_rag_mode()` — Generation with retrieved context
-- `_run_general_mode()` — Fallback generation without context
+- `NaiveRAG` - Main architecture class
+- `run()` - Entry point for query processing
+- `_run_rag_mode()` - Generation with retrieved context
+- `_run_general_mode()` - Fallback generation without context

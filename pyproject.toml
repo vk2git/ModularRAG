@@ -22,7 +22,6 @@ dependencies = [
     "chromadb",
     "pypdf>=6.3.0",
     "docx2txt",
-    "markdown",
 ]
 
 [project.optional-dependencies]

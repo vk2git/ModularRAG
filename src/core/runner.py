@@ -1,5 +1,5 @@
 """
-Pipeline Runner — unified interface to run any RAG architecture.
+Pipeline Runner - unified interface to run any RAG architecture.
 
 Handles:
 1. Loading global config + architecture-specific config

@@ -1,5 +1,5 @@
 """
-Reranker factory — provides cross-encoder reranking for improved retrieval quality.
+Reranker factory - provides cross-encoder reranking for improved retrieval quality.
 
 Available rerankers:
 - cross_encoder (free, local): Uses sentence-transformers cross-encoder models

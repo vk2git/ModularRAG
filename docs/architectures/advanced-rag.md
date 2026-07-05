@@ -18,16 +18,16 @@
 
 ### Step-by-Step Flow
 
-1. **Input Validation** — Query passes through guardrails (injection detection, PII redaction)
-2. **Query Rewriting** — The LLM reformulates the raw query into a search-optimized version, using conversation history for context. For example, "Tell me about that policy" becomes "What is the company return and refund policy?" This dramatically improves retrieval recall.
-3. **Hybrid Retrieval** — Runs two searches in parallel:
+1. **Input Validation** - Query passes through guardrails (injection detection, PII redaction)
+2. **Query Rewriting** - The LLM reformulates the raw query into a search-optimized version, using conversation history for context. For example, "Tell me about that policy" becomes "What is the company return and refund policy?" This dramatically improves retrieval recall.
+3. **Hybrid Retrieval** - Runs two searches in parallel:
    - **Vector search**: Semantic similarity using embeddings (captures meaning)
    - **BM25 keyword search**: Exact term matching (captures specific terms the embedding might miss)
    - Results are merged with configurable weights (default: 50/50)
-4. **Reranking** — A cross-encoder model (e.g., `ms-marco-MiniLM-L-6-v2`) re-scores every retrieved document against the original query. This is more accurate than vector similarity alone because it processes query and document together.
-5. **Generation** — LLM generates a response grounded in the top reranked documents. If no documents are found, falls back to general chat mode.
-6. **Output Validation** — Response passes through output guardrails
-7. **Memory** — Interaction is saved to chat history
+4. **Reranking** - A cross-encoder model (e.g., `ms-marco-MiniLM-L-6-v2`) re-scores every retrieved document against the original query. This is more accurate than vector similarity alone because it processes query and document together.
+5. **Generation** - LLM generates a response grounded in the top reranked documents. If no documents are found, falls back to general chat mode.
+6. **Output Validation** - Response passes through output guardrails
+7. **Memory** - Interaction is saved to chat history
 
 ### When to Use
 
@@ -127,10 +127,10 @@ Adds a cross-encoder on top of hybrid search. The cross-encoder processes each (
 
 ## Limitations
 
-- **Higher latency** — Query rewriting, hybrid search, and reranking each add processing time
-- **Reranker dependency** — Cross-encoder reranking requires `sentence-transformers` (install with `uv pip install 'modular-rag[rerank]'`)
-- **Single retrieval pass** — Still only retrieves once (no retry loop like Corrective RAG)
-- **No relevance verification** — Doesn't check if retrieved docs are actually relevant (unlike Corrective RAG)
+- **Higher latency** - Query rewriting, hybrid search, and reranking each add processing time
+- **Reranker dependency** - Cross-encoder reranking requires `sentence-transformers` (install with `uv pip install 'modular-rag[rerank]'`)
+- **Single retrieval pass** - Still only retrieves once (no retry loop like Corrective RAG)
+- **No relevance verification** - Doesn't check if retrieved docs are actually relevant (unlike Corrective RAG)
 
 For self-correcting retrieval, see [Corrective RAG](./corrective-rag.md). For hallucination-aware generation, see [Self-RAG](./self-rag.md).
 
@@ -152,12 +152,12 @@ For self-correcting retrieval, see [Corrective RAG](./corrective-rag.md). For ha
 Source: [`src/core/architectures/advanced.py`](../../src/core/architectures/advanced.py)
 
 Key classes and methods:
-- `AdvancedRAG` — Main architecture class
-- `run()` — Entry point for query processing
-- `_rewrite_query()` — LLM-based query reformulation
-- `_generate_with_context()` — Generation with retrieved context
-- `_generate_general()` — Fallback generation without context
+- `AdvancedRAG` - Main architecture class
+- `run()` - Entry point for query processing
+- `_rewrite_query()` - LLM-based query reformulation
+- `_generate_with_context()` - Generation with retrieved context
+- `_generate_general()` - Fallback generation without context
 
 Related components:
-- [`src/core/components/retriever.py`](../../src/core/components/retriever.py) — `RetrieverFactory` (basic/hybrid/reranked)
-- [`src/core/components/reranker.py`](../../src/core/components/reranker.py) — `RerankerFactory` (cross-encoder/cohere)
+- [`src/core/components/retriever.py`](../../src/core/components/retriever.py) - `RetrieverFactory` (basic/hybrid/reranked)
+- [`src/core/components/reranker.py`](../../src/core/components/reranker.py) - `RerankerFactory` (cross-encoder/cohere)

@@ -22,15 +22,15 @@ Why use a heavy Agentic RAG pipeline (slow, expensive) for a simple factual ques
 
 ### Step-by-Step Flow
 
-1. **Input Validation** — Query passes through guardrails
-2. **Classification** — An LLM evaluates the query and categorizes it into one of four complexity levels:
+1. **Input Validation** - Query passes through guardrails
+2. **Classification** - An LLM evaluates the query and categorizes it into one of four complexity levels:
    - `simple`: Direct factual questions, lookups, definitions
    - `moderate`: Questions requiring synthesis or minor contextual understanding
    - `complex`: Multi-hop reasoning, analytical questions
    - `exploratory`: Open-ended research questions
-3. **Routing** — The system maps the assigned category to a specific RAG architecture (configurable in `adaptive.yaml`).
-4. **Execution** — The selected architecture is instantiated and executed, inheriting the same session and history.
-5. **Output Validation** — Response passes through output guardrails
+3. **Routing** - The system maps the assigned category to a specific RAG architecture (configurable in `adaptive.yaml`).
+4. **Execution** - The selected architecture is instantiated and executed, inheriting the same session and history.
+5. **Output Validation** - Response passes through output guardrails
 
 ### LangGraph State Machine
 
@@ -106,8 +106,8 @@ You: Based on the Q3 report, what are the biggest risks compared to last year?
 
 ## Limitations
 
-- **Classification Latency** — Adaptive RAG adds an upfront LLM call to classify the query. For very fast systems, this initial overhead might negate the speed benefits of routing to Naive RAG.
-- **Classifier Accuracy** — If the LLM misclassifies a complex query as "simple", the Naive RAG pipeline will likely fail to answer it correctly.
+- **Classification Latency** - Adaptive RAG adds an upfront LLM call to classify the query. For very fast systems, this initial overhead might negate the speed benefits of routing to Naive RAG.
+- **Classifier Accuracy** - If the LLM misclassifies a complex query as "simple", the Naive RAG pipeline will likely fail to answer it correctly.
 
 ---
 
@@ -122,7 +122,7 @@ You: Based on the Q3 report, what are the biggest risks compared to last year?
 Source: [`src/core/architectures/adaptive.py`](../../src/core/architectures/adaptive.py)
 
 Key classes and methods:
-- `AdaptiveRAG` — Main architecture class
-- `_classify_query()` — LLM-based query classification
-- `_route_by_complexity()` — Maps classification to target architecture
-- `_run_naive()`, `_run_advanced()`, etc. — Sub-graph execution nodes
+- `AdaptiveRAG` - Main architecture class
+- `_classify_query()` - LLM-based query classification
+- `_route_by_complexity()` - Maps classification to target architecture
+- `_run_naive()`, `_run_advanced()`, etc. - Sub-graph execution nodes

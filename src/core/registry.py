@@ -1,5 +1,5 @@
 """
-Architecture Registry — discovers and manages all available RAG architectures.
+Architecture Registry - discovers and manages all available RAG architectures.
 
 The registry auto-discovers architecture classes from src/core/architectures/
 and provides a unified interface to list, get, and check their status.
@@ -9,7 +9,7 @@ from typing import Dict, List, Optional, Type
 from src.core.architectures.base import BaseArchitecture
 
 
-# All available architectures — import once, register here
+# All available architectures - import once, register here
 _ARCHITECTURE_CLASSES: Dict[str, Type[BaseArchitecture]] = {}
 
 
